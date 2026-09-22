@@ -2,12 +2,17 @@
 
 from __future__ import annotations
 
+import sys
 from pathlib import Path
 
 import pytest
-import tomllib
 
 import reflex_plasma_ui
+
+if sys.version_info >= (3, 11):
+    import tomllib
+else:  # pragma: no cover - 3.10 only
+    import tomli as tomllib
 
 ROOT = Path(__file__).resolve().parents[1]
 PACKAGE_DIR = Path(reflex_plasma_ui.__file__).parent

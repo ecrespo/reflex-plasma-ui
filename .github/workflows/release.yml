@@ -34,6 +34,8 @@ jobs:
       - uses: astral-sh/setup-uv@v10.2.0
         with:
           enable-cache: true
+          # tomllib, used by the version check below, is stdlib from 3.11.
+          python-version: "3.12"
 
       - name: Install
         run: |
