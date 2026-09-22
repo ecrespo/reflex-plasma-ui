@@ -1,0 +1,154 @@
+name: release
+
+# Tag a release and everything else follows:
+#
+#     git tag -a v0.1.0 -m "v0.1.0" && git push origin v0.1.0
+#
+# The tag must match `version` in pyproject.toml - the build job refuses to
+# continue otherwise, so a mistyped tag can never reach PyPI.
+on:
+  push:
+    tags: ["v*.*.*"]
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Build and attach artifacts, but do not upload to PyPI"
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+env:
+  FORCE_COLOR: "1"
+  TELEMETRY_ENABLED: "false"
+
+jobs:
+  build:
+    name: build the distribution
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@v10.2.0
+        with:
+          enable-cache: true
+          # tomllib, used by the version check below, is stdlib from 3.11.
+          python-version: "3.12"
+
+      - name: Install
+        run: |
+          uv venv
+          uv pip install -e ".[dev]"
+          echo "$PWD/.venv/bin" >> "$GITHUB_PATH"
+
+      - name: The tag and pyproject.toml must agree
+        id: version
+        run: |
+          set -euo pipefail
+          version=$(python -c "import tomllib;print(tomllib.load(open('pyproject.toml','rb'))['project']['version'])")
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          if [ "${GITHUB_REF_TYPE:-}" = "tag" ]; then
+            tag="${GITHUB_REF_NAME#v}"
+            if [ "$tag" != "$version" ]; then
+              echo "::error::tag v$tag does not match pyproject version $version"
+              exit 1
+            fi
+          fi
+          echo "releasing $version"
+
+      - name: The version must not already be on PyPI
+        run: |
+          set -euo pipefail
+          code=$(curl -s -o /dev/null -w "%{http_code}" \
+            "https://pypi.org/pypi/reflex-plasma-ui/${{ steps.version.outputs.version }}/json")
+          if [ "$code" = "200" ]; then
+            echo "::error::reflex-plasma-ui ${{ steps.version.outputs.version }} is already on PyPI - bump the version"
+            exit 1
+          fi
+
+      - name: Test
+        run: pytest -q
+
+      - name: Build sdist and wheel
+        run: python -m build
+
+      - name: Check the rendered PyPI metadata
+        run: twine check --strict dist/*
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: dist
+          path: dist/
+          if-no-files-found: error
+
+  pypi:
+    name: publish to PyPI
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' || inputs.dry_run == false
+    environment:
+      name: pypi
+      url: https://pypi.org/p/reflex-plasma-ui
+    permissions:
+      # Trusted Publishing: PyPI verifies this workflow's OIDC identity, so no
+      # API token is stored anywhere. Configure it once at
+      # https://pypi.org/manage/account/publishing/ (see RELEASING.md).
+      id-token: write
+    steps:
+      - uses: actions/download-artifact@v8
+        with:
+          name: dist
+          path: dist/
+      - uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          print-hash: true
+
+  github-release:
+    name: publish the GitHub release
+    needs: [build, pypi]
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push'
+    permissions:
+      contents: write
+      id-token: write
+      attestations: write
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/download-artifact@v8
+        with:
+          name: dist
+          path: dist/
+
+      - name: Attest the artifacts that were published
+        uses: actions/attest-build-provenance@v4
+        with:
+          subject-path: "dist/*"
+
+      - name: Create the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          version="${{ needs.build.outputs.version }}"
+          notes=$(mktemp)
+          {
+            echo "## reflex-plasma-ui $version"
+            echo
+            echo '```bash'
+            echo "pip install reflex-plasma-ui==$version"
+            echo '```'
+            echo
+            if [ -f CHANGELOG.md ]; then
+              awk -v v="$version" '
+                $0 ~ "^## \\[" v "\\]" {inside=1; next}
+                inside && /^## \[/ {exit}
+                inside {print}
+              ' CHANGELOG.md
+            fi
+          } > "$notes"
+          gh release create "${GITHUB_REF_NAME}" dist/* \
+            --title "v$version" \
+            --notes-file "$notes" \
+            --verify-tag

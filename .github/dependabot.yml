@@ -1,0 +1,23 @@
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+    labels: [dependencies, ci]
+
+  - package-ecosystem: pip
+    directory: "/"
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+    labels: [dependencies]
+
+  - package-ecosystem: npm
+    # The pinned @cruxgarden/plasma-ui version the demo resolves.
+    directory: "/plasma_ui_demo/reflex.lock"
+    schedule:
+      interval: monthly
+    open-pull-requests-limit: 3
+    labels: [dependencies, frontend]
