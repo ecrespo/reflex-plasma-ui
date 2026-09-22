@@ -25,12 +25,15 @@ jobs:
     name: bandit (SAST)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: astral-sh/setup-uv@v5
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@v10
         with:
           enable-cache: true
       - name: Install
-        run: uv pip install --system "bandit[toml]>=1.7"
+        run: |
+          uv venv
+          uv pip install "bandit[toml]>=1.7"
+          echo "$PWD/.venv/bin" >> "$GITHUB_PATH"
       - name: Scan
         run: bandit -c pyproject.toml -r custom_components plasma_ui_demo/plasma_ui_demo
       - name: Report
@@ -38,7 +41,7 @@ jobs:
         run: |
           bandit -c pyproject.toml -r custom_components plasma_ui_demo/plasma_ui_demo \
             -f json -o bandit-report.json || true
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: bandit-report
@@ -49,14 +52,15 @@ jobs:
     name: pip-audit (dependencies)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: astral-sh/setup-uv@v5
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@v10
         with:
           enable-cache: true
       - name: Install the project and the auditor
         run: |
-          uv pip install --system -e .
-          uv pip install --system "pip-audit>=2.7"
+          uv venv
+          uv pip install -e . "pip-audit>=2.7"
+          echo "$PWD/.venv/bin" >> "$GITHUB_PATH"
       - name: Audit the installed dependency tree
         # The project itself is not on PyPI while a release is in flight.
         run: pip-audit --progress-spinner off --skip-editable
@@ -69,7 +73,7 @@ jobs:
     name: gitleaks (secret scanning)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           # Scan the whole history, not just the tip.
           fetch-depth: 0
@@ -82,7 +86,7 @@ jobs:
           gitleaks version
       - name: Scan the repository history
         run: gitleaks detect --source . --redact --verbose --report-format sarif --report-path gitleaks.sarif
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: gitleaks-report
@@ -97,7 +101,7 @@ jobs:
       security-events: write
       actions: read
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: github/codeql-action/init@v3
         with:
           languages: python
@@ -114,8 +118,8 @@ jobs:
       contents: read
       pull-requests: write
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/dependency-review-action@v4
+      - uses: actions/checkout@v7
+      - uses: actions/dependency-review-action@v5
         with:
           fail-on-severity: moderate
           comment-summary-in-pr: on-failure
