@@ -6,6 +6,14 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+### Changed
+
+- CodeQL moves to `github/codeql-action@v4`.
+- Dependabot opens its pull requests against `develop`. Its default is the
+  repository's default branch, `main`, and a bump merged straight there would
+  leave `develop` behind — everything that reaches `main` in this repository
+  comes through `develop`.
+
 ## [0.1.1] - 2026-09-23
 
 First release to reach PyPI. Functionally identical to 0.1.0, which was tagged
