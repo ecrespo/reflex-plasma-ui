@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "reflex-plasma-ui"
-version = "0.1.0"
+version = "0.1.1"
 description = "Plasma UI for Reflex: liquid WebGL panels that fuse on contact, refract what is behind them and snap to a grid."
 readme = "README.md"
 license = "MIT"
@@ -17,7 +17,6 @@ dependencies = ["reflex>=0.9.12"]
 
 classifiers = [
     "Development Status :: 4 - Beta",
-    "Framework :: Reflex",
     "Operating System :: OS Independent",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.10",
@@ -47,6 +46,9 @@ dev = [
     "pip-audit>=2.7",
     # tomllib is stdlib from 3.11; the tests read pyproject.toml on 3.10 too.
     'tomli>=2.0; python_version < "3.11"',
+    # The upload is the only other place a bad classifier is caught, and by
+    # then the version number is spent.
+    "trove-classifiers>=2024.1.1",
 ]
 
 [tool.setuptools.packages.find]
