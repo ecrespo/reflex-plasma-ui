@@ -47,6 +47,28 @@ def test_stub_file_accompanies_the_component_module() -> None:
     assert (PACKAGE_DIR / "plasma_ui.pyi").is_file()
 
 
+def test_every_classifier_is_a_real_trove_classifier() -> None:
+    """PyPI rejects the whole upload over one bad classifier, with a 400.
+
+    ``twine check --strict`` does not catch this: it validates that the
+    metadata renders, not that the classifiers exist. Without this test the
+    first place the mistake shows up is the upload, and by then the version
+    number has been spent.
+    """
+    from trove_classifiers import classifiers as known
+
+    declared = _pyproject()["project"]["classifiers"]
+    unknown = [c for c in declared if c not in known]
+    assert not unknown, f"PyPI will reject these classifiers: {unknown}"
+
+
+def test_the_supported_python_versions_are_claimed_as_classifiers() -> None:
+    """A version in the CI matrix that PyPI never hears about helps nobody."""
+    declared = set(_pyproject()["project"]["classifiers"])
+    for minor in range(10, 14):
+        assert f"Programming Language :: Python :: 3.{minor}" in declared
+
+
 def test_declared_dependency_on_reflex() -> None:
     deps = _pyproject()["project"]["dependencies"]
     assert any(d.startswith("reflex") for d in deps)
