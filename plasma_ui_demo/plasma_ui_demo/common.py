@@ -12,6 +12,7 @@ PAGES = [
     ("Workspace", "/workspace"),
     ("Materials", "/materials"),
     ("Layers", "/layers"),
+    ("Controls", "/controls"),
 ]
 
 

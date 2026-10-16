@@ -185,3 +185,15 @@ body:has(.app), body:has(.mpage) { overflow: hidden; }
 .plasma-panel > * { transition: opacity 160ms ease-out; }
 main.site > section .seg { width: fit-content; }
 main.site > section:first-child { margin-top: 60px; }
+
+/* ---------- controls page ---------- */
+/* Standalone controls sit further apart than the blend distance; the group sits flush on purpose. */
+.ctl-row { display: flex; flex-wrap: wrap; align-items: center; gap: 48px; margin-top: 28px; }
+.ctl-group { display: inline-flex; gap: 0; margin-top: 48px; }
+.ctl-sliders { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 48px; margin-top: 12px; }
+.ctl-slider label { display: flex; justify-content: space-between; color: var(--muted); font-size: .88rem; margin-bottom: 10px; }
+.ctl-slider label span { font-family: "JetBrains Mono", monospace; color: var(--text); }
+.ctl-panel { max-width: 56ch; color: var(--muted); }
+.ctl-accordion { max-width: 620px; margin-top: 24px; }
+.ctl-accordion p { margin: 0; color: var(--muted); }
+.readout { font-family: "JetBrains Mono", monospace; font-size: .8rem; color: var(--muted); margin-top: 20px; white-space: pre; }

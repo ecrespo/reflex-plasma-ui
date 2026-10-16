@@ -6,11 +6,12 @@ Pages
 /workspace  Workspace  - the upstream real-world example, ported
 /materials  Materials  - plasma, crystal, metal, mercury, wood, stone, cloud
 /layers     Layers     - backgrounds, form-in/out lifecycle, pulses, dialog above a scrim
+/controls   Controls   - button, switch, slider, tabs and accordion driven by backend state
 """
 
 import reflex as rx
 
-from .pages import layers, materials, playground, workspace
+from .pages import controls, layers, materials, playground, workspace
 
 FONTS = (
     "https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600"
@@ -34,3 +35,4 @@ app.add_page(
 app.add_page(workspace.page, route="/workspace", title="Plasma UI for Reflex - Workspace")
 app.add_page(materials.page, route="/materials", title="Plasma UI for Reflex - Materials")
 app.add_page(layers.page, route="/layers", title="Plasma UI for Reflex - Layers")
+app.add_page(controls.page, route="/controls", title="Plasma UI for Reflex - Controls")
