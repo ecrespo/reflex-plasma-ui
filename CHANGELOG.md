@@ -8,6 +8,15 @@ All notable changes to this project are documented here. The format follows
 
 ### Changed
 
+- Wraps `@cruxgarden/plasma-ui@0.8.0` (was `0.7.0`). The upgrade is additive
+  upstream: every export, prop and event the wrapper uses is unchanged, so no
+  Python API changes. It brings the upstream fix for the form-in/out spring on
+  slow displays (surfaces no longer flash and disappear). The provider now
+  also injects the stylesheet for the new upstream controls; it only targets
+  `.plasma-button`, `.plasma-switch`, `.plasma-slider`, `.plasma-tab*` and
+  `.plasma-accordion*` classes. The new controls themselves (`PlasmaButton`,
+  `PlasmaSwitch`, `PlasmaSlider`, `PlasmaTabs`, `PlasmaAccordion`) are not
+  wrapped yet.
 - CodeQL moves to `github/codeql-action@v4`.
 - Dependabot opens its pull requests against `develop`. Its default is the
   repository's default branch, `main`, and a bump merged straight there would

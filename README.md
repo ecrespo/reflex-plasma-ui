@@ -8,7 +8,7 @@
 
 [Plasma UI](https://github.com/CruxGarden/plasma-ui) for [Reflex](https://reflex.dev): liquid panels rendered in WebGL on canvas. Every panel on the page is **one shared plasma** — surfaces fuse on contact, refract whatever is behind them, stretch when thrown and snap to a grid. The DOM stays ordinary, accessible HTML; the canvas only draws.
 
-Wraps `@cruxgarden/plasma-ui@0.7.0` (pinned, installed automatically by Reflex). Works on Chrome, Edge, Firefox and Safari 16.4+ (WebGL2). Without WebGL2, every surface falls back to a frosted CSS panel with drag and snap intact. The effect is GPU-heavy, so it belongs on desktop browsers.
+Wraps `@cruxgarden/plasma-ui@0.8.0` (pinned, installed automatically by Reflex). Works on Chrome, Edge, Firefox and Safari 16.4+ (WebGL2). Without WebGL2, every surface falls back to a frosted CSS panel with drag and snap intact. The effect is GPU-heavy, so it belongs on desktop browsers.
 
 ```bash
 pip install reflex-plasma-ui

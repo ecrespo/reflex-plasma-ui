@@ -19,7 +19,7 @@ on elements marked with ``data-plasma-pulse``.
 """
 
 NPM_PACKAGE = "@cruxgarden/plasma-ui"
-NPM_VERSION = "0.7.0"
+NPM_VERSION = "0.8.0"
 NPM_SPEC = f"{NPM_PACKAGE}@{NPM_VERSION}"
 
 REGISTRY_CODE = r"""
