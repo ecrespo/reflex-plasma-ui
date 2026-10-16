@@ -29,7 +29,7 @@ authentication or authorisation logic. Its attack surface is:
   Reflex compiles into every page that uses a plasma component. It is a static
   string: no props are interpolated into it, so a prop value cannot become code.
 - **The npm dependency** `@cruxgarden/plasma-ui`, pinned to an exact version
-  (`0.7.0`) so an upstream release cannot change what your build installs.
+  (`0.8.0`) so an upstream release cannot change what your build installs.
 - **Selector props** (`bounds_selector`, `background_selector`) are passed to
   `document.querySelector` in the browser. Treat them as you would any selector:
   they are a lookup, not an injection point, but do not build them from

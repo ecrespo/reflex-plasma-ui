@@ -43,8 +43,9 @@ def test_py_typed_marker_is_shipped() -> None:
     assert "py.typed" in package_data
 
 
-def test_stub_file_accompanies_the_component_module() -> None:
-    assert (PACKAGE_DIR / "plasma_ui.pyi").is_file()
+@pytest.mark.parametrize("module", ["plasma_ui", "controls"])
+def test_stub_file_accompanies_each_component_module(module: str) -> None:
+    assert (PACKAGE_DIR / f"{module}.pyi").is_file()
 
 
 def test_every_classifier_is_a_real_trove_classifier() -> None:

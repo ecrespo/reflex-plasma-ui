@@ -19,7 +19,7 @@ on elements marked with ``data-plasma-pulse``.
 """
 
 NPM_PACKAGE = "@cruxgarden/plasma-ui"
-NPM_VERSION = "0.7.0"
+NPM_VERSION = "0.8.0"
 NPM_SPEC = f"{NPM_PACKAGE}@{NPM_VERSION}"
 
 REGISTRY_CODE = r"""
@@ -117,3 +117,33 @@ function ReflexPlasmaCanvas({ canvasStyle, className, zIndex }) {
   return createElement(PlasmaCanvas, { className, zIndex, style: canvasStyle });
 }
 """
+
+# A slider bound to state waits a backend round-trip per step, and meanwhile
+# React resets the range input to the old prop: fast steps and drags are lost.
+# Hold the value locally while the user moves it, send every step, and adopt
+# the prop again once input settles (so a value the backend rewrites wins).
+SLIDER_SETTLE_MS = 300
+
+SLIDER_CODE = r"""
+const ReflexPlasmaSlider = forwardRef(function ReflexPlasmaSlider({ value, onValueChange, ...props }, ref) {
+  const controlled = value !== undefined && value !== null;
+  const [local, setLocal] = useState(value);
+  const latest = useRef(value);
+  const editedAt = useRef(0);
+  const timer = useRef(0);
+  useEffect(() => {
+    latest.current = value;
+    if (performance.now() - editedAt.current > __SETTLE__) setLocal(value);
+  }, [value]);
+  useEffect(() => () => clearTimeout(timer.current), []);
+  const change = useCallback((v) => {
+    editedAt.current = performance.now();
+    setLocal(v);
+    onValueChange?.(v);
+    clearTimeout(timer.current);
+    timer.current = setTimeout(() => setLocal(latest.current), __SETTLE__);
+  }, [onValueChange]);
+  if (!controlled) return createElement(PlasmaSlider, { ...props, onValueChange, ref });
+  return createElement(PlasmaSlider, { ...props, value: local, onValueChange: change, ref });
+});
+""".replace("__SETTLE__", str(SLIDER_SETTLE_MS))

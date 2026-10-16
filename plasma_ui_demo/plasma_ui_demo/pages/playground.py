@@ -566,7 +566,7 @@ def page() -> rx.Component:
             playground(),
             api(),
             rx.el.footer(
-                "reflex-plasma-ui · wraps @cruxgarden/plasma-ui 0.7.0 (MIT) · a Crux Garden project",
+                "reflex-plasma-ui · wraps @cruxgarden/plasma-ui 0.8.0 (MIT) · a Crux Garden project",
                 class_name="footer",
             ),
             class_name="site",
