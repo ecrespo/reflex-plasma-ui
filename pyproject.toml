@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "reflex-plasma-ui"
-version = "0.1.1"
+version = "0.2.0"
 description = "Plasma UI for Reflex: liquid WebGL panels that fuse on contact, refract what is behind them and snap to a grid."
 readme = "README.md"
 license = "MIT"
