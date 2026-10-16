@@ -6,6 +6,22 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+### Added
+
+- Wrappers for the controls new in `@cruxgarden/plasma-ui@0.8.0`:
+  `plasma_button`, `plasma_switch`, `plasma_slider`, `plasma_tabs` (with
+  `plasma_tab_list`, `plasma_tab` and `plasma_tab_panel`) and
+  `plasma_accordion` (with `plasma_accordion_item`). They live in the new
+  `reflex_plasma_ui.controls` module, are re-exported from the package, and
+  import straight from the pinned npm package with no glue code. Value
+  events reach the handler typed: `on_checked_change(bool)`,
+  `on_value_change(float)` on the slider, `(str)` on tabs and `(list[str])`
+  on the accordion. The surface controls take the per-surface props of
+  `plasma` (`tint`, `opacity`, `radius`, `lean`, `fuse`, `form_in`, ...).
+- A `/controls` demo page: every control bound to backend state, with the
+  sliders, switches and tabs driving the provider's `frost`, `blend`,
+  `elevation`, `pointer_drop`, `ambient_drops` and `mood` live.
+
 ### Changed
 
 - Wraps `@cruxgarden/plasma-ui@0.8.0` (was `0.7.0`). The upgrade is additive
@@ -14,9 +30,7 @@ All notable changes to this project are documented here. The format follows
   slow displays (surfaces no longer flash and disappear). The provider now
   also injects the stylesheet for the new upstream controls; it only targets
   `.plasma-button`, `.plasma-switch`, `.plasma-slider`, `.plasma-tab*` and
-  `.plasma-accordion*` classes. The new controls themselves (`PlasmaButton`,
-  `PlasmaSwitch`, `PlasmaSlider`, `PlasmaTabs`, `PlasmaAccordion`) are not
-  wrapped yet.
+  `.plasma-accordion*` classes.
 - CodeQL moves to `github/codeql-action@v4`.
 - Dependabot opens its pull requests against `develop`. Its default is the
   repository's default branch, `main`, and a bump merged straight there would

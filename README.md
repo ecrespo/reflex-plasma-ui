@@ -97,6 +97,84 @@ On `plasma`, `opacity` and `padding` are the plasma props (tint strength, join-a
 
 With `plasma_provider(canvas=False)`, place the canvas yourself. `canvas_style` is the real inline style (camelCase keys).
 
+### Controls
+
+`@cruxgarden/plasma-ui` 0.8.0 adds ready-made controls built on plasma surfaces. Put them inside a `plasma_provider`. Each one fuses with whatever it touches and counts toward `max_surfaces`: a three-tab list is three surfaces. Colors follow the page's text color.
+
+```python
+import reflex as rx
+
+from reflex_plasma_ui import (
+    plasma_accordion,
+    plasma_accordion_item,
+    plasma_button,
+    plasma_provider,
+    plasma_slider,
+    plasma_switch,
+    plasma_tab,
+    plasma_tab_list,
+    plasma_tab_panel,
+    plasma_tabs,
+)
+
+
+class Settings(rx.State):
+    wifi: bool = True
+    volume: float = 40
+    section: str = "a"
+    open_items: list[str] = ["q1"]
+
+    @rx.event
+    def set_wifi(self, checked: bool):
+        self.wifi = checked
+
+    @rx.event
+    def set_volume(self, value: float):
+        self.volume = value
+
+    @rx.event
+    def set_section(self, value: str):
+        self.section = value
+
+    @rx.event
+    def set_open(self, values: list[str]):
+        self.open_items = values
+
+
+def index() -> rx.Component:
+    return plasma_provider(
+        plasma_button("Save", solid=True, on_click=rx.toast("Saved")),
+        plasma_switch(label="Wi-Fi", checked=Settings.wifi, on_checked_change=Settings.set_wifi),
+        plasma_slider(aria_label="Volume", value=Settings.volume, on_value_change=Settings.set_volume),
+        plasma_tabs(
+            plasma_tab_list(plasma_tab("One", value="a"), plasma_tab("Two", value="b"), aria_label="Sections"),
+            plasma_tab_panel("First", value="a"),
+            plasma_tab_panel("Second", value="b"),
+            value=Settings.section,
+            on_value_change=Settings.set_section,
+        ),
+        plasma_accordion(
+            plasma_accordion_item("Liquid panels for Reflex.", value="q1", title="What is it?"),
+            plasma_accordion_item("Because it fuses.", value="q2", title="Why?"),
+            value=Settings.open_items,
+            on_value_change=Settings.set_open,
+        ),
+        mood="tidal",
+        max_surfaces=24,
+    )
+```
+
+| Component | Own props | Notes |
+| --- | --- | --- |
+| `plasma_button` | `solid` (fill with the tint, default `False`), `size` (`"sm"`/`"md"`/`"lg"`), `type`, `disabled` | Pulses from the pointer on click (not under reduced motion). `on_click` and every `<button>` attribute pass through. |
+| `plasma_switch` | `checked`, `default_checked`, `on_checked_change(bool)`, `label`, `checked_tint`, `disabled` | `role="switch"`. With `label` the text toggles it and names it; without one, pass `aria_label`. |
+| `plasma_slider` | `value`, `default_value`, `on_value_change(float)`, `min` (0), `max` (100), `step` (1), `disabled`, `name` | A native range input under the track. `aria_label`, `aria_labelledby`, `aria_valuetext` and `id` go to the input. `on_value_change` fires on every step. |
+| `plasma_tabs` | `value`, `default_value`, `on_value_change(str)`, `orientation` (`"horizontal"`/`"vertical"`) | Holds state only. `plasma_tab_list` lays the tabs flush so they fuse (give it an `aria_label`), `plasma_tab(value=...)` is each segment, and `plasma_tab_panel(value=...)` mounts its children only while selected. |
+| `plasma_accordion` | `type` (`"single"`/`"multiple"`), `value`, `default_value`, `on_value_change(list[str])` | Open items are always a list. Items sit flush and fuse into one column; add a `gap` to its style to keep them apart. |
+| `plasma_accordion_item` | `value`, `title`, `disabled`, `heading_level` (default 3) | The children are the content. |
+
+The button, switch, slider, tab and accordion item are surfaces themselves, so they also take `plasma`'s `radius`, `lean`, `tint`, `opacity`, `frost`, `elevation`, `padding`, `fuse`, `form_in`, `form_out`, `on_join_change`, `on_forming` and `on_formed`. Keep separate controls further apart than the blend distance (40 px with the built-in moods), or flush on purpose.
+
 ## Runtime helpers
 
 ```python
@@ -153,11 +231,13 @@ plasma_provider(
 
 ## How it works
 
-The package has no `library` import of its own. Three small wrapper components (`ReflexPlasmaProvider`, `ReflexPlasma`, `ReflexPlasmaCanvas`) are compiled into the page as custom code, and Reflex installs the pinned npm package from their imports. The wrappers:
+The provider, surface and canvas have no `library` import of their own. Three small wrapper components (`ReflexPlasmaProvider`, `ReflexPlasma`, `ReflexPlasmaCanvas`) are compiled into the page as custom code, and Reflex installs the pinned npm package from their imports. The wrappers:
 
 - turn serialisable props into what React expects: selectors become ref objects and live elements;
 - publish each provider's `usePlasmaRuntime()` on `window.__reflexPlasma[name]`, which is how `pulse`/`bump` reach it;
 - track the last pointer-down, so `pulse()` lands where the user clicked.
+
+The controls take only serialisable props, so they need none of that: each one imports its upstream export straight from the same pinned package, which is why they share the provider's context.
 
 ## Demo app
 
@@ -172,6 +252,7 @@ uv run reflex run
 | `/workspace` | The upstream real-world example: bar, dock and four panels, focus elevation, layout persisted with `rx.LocalStorage`, `bump` from a backend event |
 | `/materials` | All seven materials with their physics, grounds, light direction, roughness, anisotropy and outline controls |
 | `/layers` | Backgrounds (field / color / image), form-in/out lifecycle events, pulses, and the two-provider dialog above a scrim |
+| `/controls` | Button, switch, slider, tabs and accordion bound to backend state; the sliders, switches and tabs drive the provider's frost, blend, elevation, drops and mood live |
 
 ## Development
 
