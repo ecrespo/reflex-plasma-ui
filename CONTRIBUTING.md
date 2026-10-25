@@ -4,6 +4,8 @@ Thanks for taking the time. This is a small package; the loop is short.
 
 ## Set up
 
+Python 3.11 or newer, and Node 24 to compile the demo app (CI uses both).
+
 ```bash
 uv venv
 uv pip install -e ".[dev]"
@@ -21,6 +23,12 @@ mypy
 pytest
 bandit -c pyproject.toml -r custom_components plasma_ui_demo/plasma_ui_demo
 pip-audit --skip-editable
+```
+
+The `quality` workflow also compiles the demo's production frontend on Node 24:
+
+```bash
+cd plasma_ui_demo && reflex export --frontend-only --no-zip
 ```
 
 Formatting is **not** enforced. `ruff format` would rewrite the hand-aligned
