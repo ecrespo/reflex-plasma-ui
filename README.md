@@ -14,6 +14,8 @@ Wraps `@cruxgarden/plasma-ui@0.8.0` (pinned, installed automatically by Reflex).
 pip install reflex-plasma-ui
 ```
 
+Requires Python 3.11+ and Reflex 0.10+.
+
 ## Quick start
 
 ```python
