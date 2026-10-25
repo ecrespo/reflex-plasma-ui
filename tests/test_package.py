@@ -2,17 +2,12 @@
 
 from __future__ import annotations
 
-import sys
+import tomllib
 from pathlib import Path
 
 import pytest
 
 import reflex_plasma_ui
-
-if sys.version_info >= (3, 11):
-    import tomllib
-else:  # pragma: no cover - 3.10 only
-    import tomli as tomllib
 
 ROOT = Path(__file__).resolve().parents[1]
 PACKAGE_DIR = Path(reflex_plasma_ui.__file__).parent
@@ -66,7 +61,7 @@ def test_every_classifier_is_a_real_trove_classifier() -> None:
 def test_the_supported_python_versions_are_claimed_as_classifiers() -> None:
     """A version in the CI matrix that PyPI never hears about helps nobody."""
     declared = set(_pyproject()["project"]["classifiers"])
-    for minor in range(10, 14):
+    for minor in range(11, 14):
         assert f"Programming Language :: Python :: 3.{minor}" in declared
 
 

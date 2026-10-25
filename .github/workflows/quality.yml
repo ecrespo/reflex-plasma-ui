@@ -16,6 +16,8 @@ concurrency:
 
 env:
   FORCE_COLOR: "1"
+  # Run every JavaScript action on Node 24, whatever runtime it declares.
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
   TELEMETRY_ENABLED: "false"
 
 jobs:
@@ -24,7 +26,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
-      - uses: astral-sh/setup-uv@v10.3.0
+      - uses: astral-sh/setup-uv@v10.3.2
         with:
           enable-cache: true
       - name: Install
@@ -40,7 +42,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
-      - uses: astral-sh/setup-uv@v10.3.0
+      - uses: astral-sh/setup-uv@v10.3.2
         with:
           enable-cache: true
       - name: Install
@@ -57,10 +59,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.10", "3.11", "3.12", "3.13"]
+        python-version: ["3.11", "3.12", "3.13"]
     steps:
       - uses: actions/checkout@v7
-      - uses: astral-sh/setup-uv@v10.3.0
+      - uses: astral-sh/setup-uv@v10.3.2
         with:
           enable-cache: true
           python-version: ${{ matrix.python-version }}
@@ -79,12 +81,34 @@ jobs:
           path: coverage.xml
           if-no-files-found: error
 
+  demo:
+    name: compile the demo app (Node 24)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "24"
+      - uses: astral-sh/setup-uv@v10.3.2
+        with:
+          enable-cache: true
+      - name: Install
+        run: |
+          uv venv
+          uv pip install -e .
+          echo "$PWD/.venv/bin" >> "$GITHUB_PATH"
+      - name: Compile and build the production frontend
+        # Catches what the unit tests cannot: a Reflex release that breaks the
+        # page compiler, or an npm import that no longer resolves.
+        working-directory: plasma_ui_demo
+        run: reflex export --frontend-only --no-zip
+
   build:
     name: build & verify the distribution
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
-      - uses: astral-sh/setup-uv@v10.3.0
+      - uses: astral-sh/setup-uv@v10.3.2
         with:
           enable-cache: true
       - name: Install

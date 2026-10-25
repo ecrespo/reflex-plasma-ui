@@ -6,6 +6,28 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-10-25
+
+### Changed
+
+- Requires Reflex 0.10 (`reflex>=0.10.0`, was `>=0.9.12`). The component, the
+  controls and the demo compile and run on it unchanged; no Python API
+  changes. The demo's frontend lock moves with it (React 19.3, Vite 8.3).
+- Requires Python 3.11 or newer, because Reflex 0.10 does. Python 3.10 leaves
+  the classifiers and the CI matrix, and the `tomli` fallback the tests used
+  on 3.10 is gone.
+- CI runs every JavaScript action on Node 24
+  (`FORCE_JAVASCRIPT_ACTIONS_TO_NODE24`), and `astral-sh/setup-uv` moves to
+  10.3.2.
+- The build backend floor rises to `setuptools>=78.1.1`.
+
+### Added
+
+- A `demo` job in the `quality` workflow that compiles the demo app's
+  production frontend on Node 24 (`reflex export --frontend-only`), so a
+  Reflex release that breaks the page compiler fails CI instead of the next
+  user.
+
 ## [0.2.0] - 2026-10-16
 
 ### Added
@@ -88,7 +110,8 @@ First public release.
 - Requires WebGL2; without it every surface falls back to a frosted CSS panel
   with drag and snap intact.
 
-[Unreleased]: https://github.com/ecrespo/reflex-plasma-ui/compare/v0.2.0...HEAD
+[Unreleased]: https://github.com/ecrespo/reflex-plasma-ui/compare/v0.3.0...HEAD
+[0.3.0]: https://github.com/ecrespo/reflex-plasma-ui/releases/tag/v0.3.0
 [0.2.0]: https://github.com/ecrespo/reflex-plasma-ui/releases/tag/v0.2.0
 [0.1.1]: https://github.com/ecrespo/reflex-plasma-ui/releases/tag/v0.1.1
 [0.1.0]: https://github.com/ecrespo/reflex-plasma-ui/releases/tag/v0.1.0
